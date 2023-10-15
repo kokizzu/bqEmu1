@@ -1,2 +1,4 @@
 .idea
 db.sqlite
+bigquery-emulator-linux-amd64
+bigquery-emulator-darwin-amd64

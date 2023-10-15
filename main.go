@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/kokizzu/goproc"
@@ -16,7 +19,7 @@ import (
 
 func main() {
 
-	// try using docker since embeeded one failed to compile
+	// try using binary since embeeded one failed to compile
 	ctx := context.Background()
 	const (
 		projectID = "test"
@@ -26,12 +29,11 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	cmdId := proc.AddCommand(&goproc.Cmd{
-		Program: "docker",
+		Program: "./bigquery-emulator-linux-amd64", // download this from: https://github.com/goccy/bigquery-emulator/releases
 		Parameters: []string{
-			`run`, `-t`, `ghcr.io/goccy/bigquery-emulator:latest`,
 			`--project=` + projectID,
 			`--dataset=` + datasetID,
-			//`--database=db.sqlite`,
+			`--database=db.sqlite`,
 		},
 		PrefixLabel: "[BQE]",
 		OnStdout: func(cmd *goproc.Cmd, s string) error {
@@ -49,7 +51,17 @@ func main() {
 		},
 	})
 	go proc.StartAllParallel()
-	defer proc.Kill(cmdId)
+	defer func() {
+		L.PanicIf(proc.Kill(cmdId), `proc.Kill.defer`)
+	}()
+
+	// catch Ctrl+C
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sig
+		L.PanicIf(proc.Kill(cmdId), `proc.Kill.signal`)
+	}()
 
 	wg.Wait() // wait for ready
 
