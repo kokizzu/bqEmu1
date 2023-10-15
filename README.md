@@ -10,3 +10,7 @@ it's quite useful because you might hate sqlite interface, and you prefer bigque
 
 So if your project became super large, you can move it to bigquery so it can be mass-run by a lot of people (as long as you can pay the bigquery bill).
 
+## Requirement
+
+- download `bigquery-emulator-linux-amd64` from [bigquery-emulator](//github.com/goccy/bigquery-emulator/releases)
+- `go run main.go`
