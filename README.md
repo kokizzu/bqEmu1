@@ -14,3 +14,12 @@ So if your project became super large, you can move it to bigquery so it can be 
 
 - download `bigquery-emulator-linux-amd64` from [bigquery-emulator](//github.com/goccy/bigquery-emulator/releases)
 - `go run main.go`
+
+## Maintenance Checklist
+
+- [x] Update the Go runtime directive to Go 1.26.5.
+- [x] Refresh BigQuery, protobuf, gRPC, and Google API dependencies.
+- [x] Add Makefile targets for vulnerability checks and arbitrary commands.
+- [x] Run `make test`.
+- [x] Run `make verify-dependency-security`.
+- [x] Run `make vulncheck`; no reachable vulnerabilities were found.
